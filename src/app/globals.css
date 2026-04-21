@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ✨ CHANGE THESE COLORS FOR YOUR FESTIVE GRADIENT ✨ */
+    --festive-grad-start: #000000;
+    --festive-grad-mid: #1a1a1a;
+    --festive-grad-end: #0a0a0a;
+  }
+
+  body {
+    @apply text-white font-inter;
+    scroll-behavior: smooth;
+  }
+}
+
+/* 
+  Festive Dynamic Background. 
+  You can freely edit this class later into a complex radial/conic gradient 
+  or add keyframe animations to shift the gradient colors!
+*/
+.festive-bg {
+  background: #552A9B;
+  background: -webkit-linear-gradient(263deg, rgba(85, 42, 155, 1) 0%, rgba(255, 103, 139, 1) 50%, rgba(255, 244, 141, 1) 100%);
+  background: -moz-linear-gradient(263deg, rgba(85, 42, 155, 1) 0%, rgba(255, 103, 139, 1) 50%, rgba(255, 244, 141, 1) 100%);
+  background: linear-gradient(263deg, rgba(85, 42, 155, 1) 0%, rgba(255, 103, 139, 1) 50%, rgba(255, 244, 141, 1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#552A9B", endColorstr="#FFF48D", GradientType=0);
+  background-attachment: fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+/* Custom cinematic styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #eab308;
+  /* Tailwind amber-500 equivalent */
+}
+
+/* Smooth Logo Animation - Loops 24/7 */
+@keyframes smooth-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.logo-glitch {
+  animation: smooth-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.334));
+}

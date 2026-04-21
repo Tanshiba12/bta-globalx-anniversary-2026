@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 946.34 1143.69">
+  <defs>
+    <style>
+      .cls-1 {
+        letter-spacing: 0em;
+      }
+
+      .cls-2 {
+        letter-spacing: 0em;
+      }
+
+      .cls-3 {
+        font-size: 48.07px;
+      }
+
+      .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
+        font-weight: 700;
+      }
+
+      .cls-3, .cls-4, .cls-6 {
+        fill: #fff;
+        font-family: SourceSerifRoman-Bold, 'Source Serif Variable';
+        font-variation-settings: 'wght' 700;
+      }
+
+      .cls-8 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-9 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-10 {
+        letter-spacing: .02em;
+      }
+
+      .cls-4 {
+        font-size: 41.52px;
+      }
+
+      .cls-11 {
+        letter-spacing: 0em;
+      }
+
+      .cls-12 {
+        letter-spacing: 0em;
+      }
+
+      .cls-13 {
+        letter-spacing: 0em;
+      }
+
+      .cls-14 {
+        fill: #ec008c;
+      }
+
+      .cls-15 {
+        font-size: 230.75px;
+      }
+
+      .cls-16 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-17 {
+        font-size: 81.71px;
+      }
+
+      .cls-5, .cls-7 {
+        font-family: BerlinSansFBDemi-Bold, 'Berlin Sans FB Demi';
+      }
+
+      .cls-18 {
+        letter-spacing: 0em;
+      }
+
+      .cls-6 {
+        font-size: 47.12px;
+      }
+
+      .cls-19 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-20 {
+        font-size: 52.88px;
+      }
+
+      .cls-21 {
+        letter-spacing: 0em;
+      }
+
+      .cls-22 {
+        letter-spacing: -.03em;
+      }
+
+      .cls-23 {
+        font-size: 346.12px;
+      }
+
+      .cls-24 {
+        font-family: Alegreya-Regular, Alegreya;
+      }
+
+      .cls-7 {
+        font-size: 289.38px;
+      }
+
+      .cls-25 {
+        letter-spacing: -.03em;
+      }
+    </style>
+  </defs>
+  <text/>
+  <g>
+    <path class="cls-14" d="M438.69,417.75c-4.81-2.64-12.59-.69-28.05-1.29-35.23.02-77.1-.02-113.02,0-12.02.04-12.5-.26-12.47,11.07-.02,41.55,0,85.06,0,126.93.27,23.33-.65,55.79.46,72.42,1.51,5.02,5.67,3,16.58,3.53,39.06-.08,93.55.18,131.73-.11,4.47-.29,5.77-1.05,6.11-5.69-.9-26.9,2.38-171.05-1.14-206.67l-.2-.2Z"/>
+    <text class="cls-5" transform="translate(15.85 657.53) scale(1.09 1)"><tspan class="cls-23" x="0" y="0">A</tspan><tspan class="cls-15" x="240.16" y="0">&amp;</tspan><tspan class="cls-23" x="401.27" y="0">EA</tspan></text>
+    <text class="cls-6" transform="translate(523.11 648.28) rotate(-90) scale(.92 1)"><tspan x="0" y="0">E</tspan><tspan class="cls-8" x="28.04" y="0">x</tspan><tspan class="cls-1" x="53.11" y="0">c</tspan><tspan class="cls-9" x="76.95" y="0">e</tspan><tspan x="100.7" y="0">llen</tspan><tspan class="cls-11" x="184.73" y="0">c</tspan><tspan x="208.57" y="0">e</tspan></text>
+    <text class="cls-3" transform="translate(702.62 605.64) scale(1.09 1)"><tspan class="cls-16" x="0" y="0">A</tspan><tspan class="cls-25" x="29.56" y="0">w</tspan><tspan class="cls-18" x="66.24" y="0">a</tspan><tspan class="cls-19" x="91.72" y="0">r</tspan><tspan x="113.26" y="0">ds</tspan></text>
+    <text class="cls-4" transform="translate(68.01 644.14) rotate(-68.77) scale(.94 1) skewX(3.31)"><tspan x="0" y="0">Ann</tspan><tspan class="cls-2" x="79.17" y="0">i</tspan><tspan class="cls-22" x="91.96" y="0">v</tspan><tspan x="112.71" y="0">e</tspan><tspan class="cls-12" x="134.34" y="0">r</tspan><tspan class="cls-13" x="153.23" y="0">s</tspan><tspan class="cls-21" x="171.83" y="0">a</tspan><tspan class="cls-10" x="193.83" y="0">r</tspan><tspan x="213.84" y="0">y</tspan></text>
+    <text class="cls-24" transform="translate(0 368.36) scale(1.35 1)"><tspan class="cls-17" x="0" y="0">BTA GLOBALx </tspan><tspan class="cls-20" x="502.35" y="0">presents</tspan></text>
+    <text class="cls-7" transform="translate(16.92 871.05) scale(1.41 1)"><tspan x="0" y="0">2026</tspan></text>
+  </g>
+</svg>
