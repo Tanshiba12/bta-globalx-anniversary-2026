@@ -5,14 +5,14 @@ import Image from "next/image";
 
 export default function Section3_NewsRoom() {
     return (
-        <section id="section-3" className="relative min-h-screen w-full flex flex-col items-center justify-center py-24 px-6 overflow-hidden text-white" style={{ backgroundColor: "#1a1a1a" }}>
+        <section id="section-3" className="relative min-h-screen w-full flex flex-col items-center justify-center py-24 px-6 overflow-hidden text-black" style={{ backgroundColor: "transparent" }}>
             <div className="absolute inset-0 -z-10 mix-blend-overlay"></div>
 
             <div className="text-center mb-12">
                 <h2 className="text-5xl md:text-6xl font-cinzel font-bold text-white drop-shadow-sm">
                     News<span className="text-white">Room</span>
                 </h2>
-                <p className="mt-4 font-playfair font-medium text-lg text-white/80">Swipe for the latest posts and updates</p>
+                <p className="mt-4 font-playfair font-medium text-lg text-black">Swipe for the latest posts and updates</p>
             </div>
 
             {/* Carousel Container (Slide 1) */}

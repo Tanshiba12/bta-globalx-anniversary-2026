@@ -1,0 +1,70 @@
+# Quick Asset Path Reference
+
+## Use these paths in your components:
+
+```
+Section 1 (Hero)
+  SVGs:     /section1/svgs/
+  Images:   /section1/images/
+  Videos:   /section1/videos/
+
+Section 2 (Event Details)
+  SVGs:     /section2/svgs/
+  Images:   /section2/images/
+  Videos:   /section2/videos/
+
+Section 3 (NewsRoom)
+  SVGs:     /section3/svgs/
+  Images:   /section3/images/
+  Videos:   /section3/videos/
+
+Section 4 (Official Video)
+  SVGs:     /section4/svgs/
+  Images:   /section4/images/
+  Videos:   /section4/videos/
+
+Section 5 (Timeline)
+  SVGs:     /section5/svgs/
+  Images:   /section5/images/
+  Videos:   /section5/videos/
+
+Section 6 (Register)
+  SVGs:     /section6/svgs/
+  Images:   /section6/images/
+  Videos:   /section6/videos/
+
+Section 7 (Our Journey)
+  SVGs:     /section7/svgs/
+  Images:   /section7/images/
+  Videos:   /section7/videos/
+
+Section 8 (Previous Videos)
+  SVGs:     /section8/svgs/
+  Images:   /section8/images/
+  Videos:   /section8/videos/
+
+Section 9 (Excellence Awards)
+  SVGs:     /section9/svgs/
+  Images:   /section9/images/
+  Videos:   /section9/videos/
+
+Shared Assets
+  Logo:     /shared/logo/
+  Audio:    /shared/audio/
+  Models:   /shared/models/
+```
+
+## Example Imports
+
+```typescript
+// In Section1_Hero component
+import Image from "next/image";
+
+<Image src="/section1/images/hero-bg.jpg" alt="hero" fill />
+<img src="/section1/svgs/accent.svg" alt="accent" width={100} height={100} />
+<video src="/section1/videos/entrance.mp4" />
+
+// Shared assets
+<Image src="/shared/logo/BTA-Logo.gif" alt="logo" width={300} height={100} />
+<audio src="/shared/audio/cinematic-bg.mp3" autoPlay loop />
+```

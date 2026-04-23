@@ -1,54 +1,368 @@
 ﻿"use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import AnimatedButton from "@/components/ui/AnimatedButton";
-import AccentElement from "@/components/ui/AccentElement";
+import { Draggable } from "gsap/Draggable";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(useGSAP, Draggable, ScrollTrigger);
+
+// ===== MINI COUNTDOWN =====
+const MiniCountdownFigure = ({ value, label }: { value: string | number; label?: string }) => {
+    return (
+        <div className="mini-countdown-item">
+            <div className="mini-figure">
+                <span className="mini-digit">{value}</span>
+            </div>
+            {label && <span className="mini-countdown-label">{label}</span>}
+        </div>
+    );
+};
+
+function MiniCountdown() {
+    const [time, setTime] = React.useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+    React.useEffect(() => {
+        const targetDate = new Date().getTime() + (58 * 24 * 60 * 60 * 1000) + (14 * 60 * 60 * 1000) + (30 * 60 * 1000);
+
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance > 0) {
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                setTime({ days, hours, minutes, seconds });
+            } else {
+                clearInterval(interval);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const format = (val: number) => String(val).padStart(2, "0");
+
+    return (
+        <div className="mini-countdown-container">
+            <MiniCountdownFigure value={time.days > 99 ? String(time.days) : format(time.days)} label="Days" />
+            <div className="mini-separator">:</div>
+            <MiniCountdownFigure value={format(time.hours)} label="Hours" />
+            <div className="mini-separator">:</div>
+            <MiniCountdownFigure value={format(time.minutes)} label="Minutes" />
+            <div className="mini-separator">:</div>
+            <MiniCountdownFigure value={format(time.seconds)} label="Seconds" />
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .mini-countdown-container {
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: center;
+                    gap: 0.25rem;
+                    flex-wrap: wrap;
+                }
+                
+                .mini-countdown-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.25rem;
+                }
+                
+                .mini-figure {
+                    position: relative;
+                    height: 40px;
+                    width: 32px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                    backdrop-filter: blur(10px);
+                }
+                
+                .mini-figure .mini-digit {
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: #ffffff;
+                    font-family: 'var(--font-outfit), sans-serif';
+                    letter-spacing: 1px;
+                    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 100%;
+                    height: 100%;
+                }
+                
+                .mini-separator {
+                    font-size: 1rem;
+                    font-weight: 700;
+                    color: #ffffff;
+                    margin-bottom: 0.5rem;
+                    opacity: 0.8;
+                    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+                    font-family: 'var(--font-outfit), sans-serif';
+                }
+                
+                .mini-countdown-label {
+                    font-size: 0.5rem;
+                    font-weight: 600;
+                    color: #ffffff;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    opacity: 0.7;
+                    font-family: 'var(--font-outfit), sans-serif';
+                    text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+                }
+                `
+            }} />
+        </div>
+    );
+}
+
+// ===== END MINI COUNTDOWN =====
 
 export default function Section1_Intro() {
     const containerRef = useRef<HTMLElement>(null);
-    const decorativeRef = useRef<HTMLDivElement>(null);
+    const [bottomLeftImages, setBottomLeftImages] = useState<string[]>([]);
+    const [bottomRightImages, setBottomRightImages] = useState<string[]>([]);
+    const [loadingLeftImages, setLoadingLeftImages] = useState(true);
+    const [loadingRightImages, setLoadingRightImages] = useState(true);
+    const [currentLeftIndex, setCurrentLeftIndex] = useState(0);
+    const [currentRightIndex, setCurrentRightIndex] = useState(0);
 
-    // SVG decorative shapes
-    const GeometricAccent = ({ delay = 0 }: { delay?: number }) => (
-        <div
-            className="absolute opacity-0 pointer-events-none"
-            style={{
-                animation: `float 6s ease-in-out infinite`,
-                animationDelay: `${delay}s`
-            }}
-        >
-            <svg width="120" height="120" viewBox="0 0 120 120" className="text-black/10">
-                <circle cx="60" cy="60" r="50" stroke="currentColor" strokeWidth="2" fill="none" />
-                <circle cx="60" cy="60" r="35" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6" />
-                <line x1="60" y1="10" x2="60" y2="30" stroke="currentColor" strokeWidth="2" opacity="0.4" />
-                <line x1="60" y1="90" x2="60" y2="110" stroke="currentColor" strokeWidth="2" opacity="0.4" />
-            </svg>
-        </div>
-    );
+    // New deck spread state
+    const [leftDeckSpread, setLeftDeckSpread] = useState(false);
+    const [rightDeckSpread, setRightDeckSpread] = useState(false);
+    const leftCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+    const rightCardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+    // ===== IMAGE BOX CUSTOMIZATION =====
+    // Adjust these values to change size and position
+    const imageConfig = {
+        width: 256,  // Change this to adjust width (was 128, now 256 = 2x)
+        height: 256, // Change this to adjust height (was 128, now 256 = 2x)
+        leftImagePaddingRight: 'pr-4',  // Padding for left image
+        rightImagePaddingLeft: 'pl-4',  // Padding for right image
+        topPadding: 'pt-1',  // Padding above bottom-left image
+        bottomPadding: 'pb-1', // Padding below top-right image
+    };
+
+    // ===== SCATTERED DECK FUNCTIONS =====
+    // Calculate random scattered positions in a zigzag pattern
+    const getScatteredPositions = (imageCount: number, isBottom: boolean) => {
+        const positions: { x: number; y: number; rotation: number }[] = [];
+        const containerRect = containerRef.current?.getBoundingClientRect();
+
+        if (!containerRect) return positions;
+
+        const padding = 40;
+        const maxX = containerRect.width - imageConfig.width - padding;
+        const maxY = containerRect.height - imageConfig.height - padding;
+
+        for (let i = 0; i < imageCount; i++) {
+            // Spread horizontally across the width
+            const xSpread = (Math.random() - 0.5) * (maxX * 1.2);
+
+            // Vertical spread direction:
+            // isBottom = true: spread DOWNWARD (positive y)
+            // isBottom = false: spread UPWARD (negative y, towards top)
+            let yOffset: number;
+            if (isBottom) {
+                // Spread downward for bottom-left
+                yOffset = Math.random() * (maxY * 0.8) + maxY * 0.15;
+            } else {
+                // Spread upward for right-column (negative values = up)
+                yOffset = (Math.random() - 1) * (maxY * 0.8);
+            }
+
+            positions.push({
+                x: Math.max(-maxX * 0.3, Math.min(maxX * 1.3, xSpread)),
+                y: yOffset,
+                rotation: Math.random() * 25 - 12.5, // Random rotation -12.5 to +12.5
+            });
+        }
+
+        return positions;
+    };
+
+    // Handle left deck spread/collapse
+    const toggleLeftDeck = () => {
+        if (leftDeckSpread) {
+            // Collapse back to stack
+            const tl = gsap.timeline();
+            leftCardsRef.current.forEach((card, idx) => {
+                if (card) {
+                    tl.to(card, {
+                        x: idx * 4,
+                        y: idx * 4,
+                        rotation: 0,
+                        scale: 1,
+                        zIndex: bottomLeftImages.length - idx,
+                        duration: 0.5,
+                        ease: "back.inOut(1.2)",
+                    }, idx * 0.03); // Stagger
+                }
+            });
+            // Disable dragging on all cards
+            leftCardsRef.current.forEach((card) => {
+                if (card && (card as any)._gsapDraggable) {
+                    (card as any)._gsapDraggable.kill();
+                }
+            });
+            setLeftDeckSpread(false);
+        } else {
+            // Spread cards with staggered animation
+            const positions = getScatteredPositions(bottomLeftImages.length, true);
+            const tl = gsap.timeline();
+
+            leftCardsRef.current.forEach((card, idx) => {
+                if (card && positions[idx]) {
+                    const pos = positions[idx];
+                    tl.to(card, {
+                        x: pos.x,
+                        y: pos.y,
+                        rotation: pos.rotation,
+                        scale: 0.95,
+                        zIndex: 5000 + idx,
+                        duration: 0.6,
+                        ease: "elastic.out(1, 0.6)",
+                    }, idx * 0.08); // Stagger each card
+
+                    // Make draggable with throw effect
+                    gsap.set(card, { cursor: "grab" });
+                    Draggable.create(card, {
+                        type: "x,y",
+                        edgeResistance: 0.65,
+                        onDragStart() {
+                            gsap.to(card, { scale: 1.05, duration: 0.2, overwrite: "auto" });
+                            gsap.set(card, { cursor: "grabbing", zIndex: 9999 });
+                        },
+                        onDragEnd() {
+                            gsap.to(card, { scale: 0.95, duration: 0.2, overwrite: "auto" });
+                            gsap.set(card, { cursor: "grab", zIndex: 5000 + idx });
+                        },
+                        throwProps: true,
+                        throwResistance: 4000,
+                    });
+                }
+            });
+            setLeftDeckSpread(true);
+        }
+    };
+
+    // Handle right deck spread/collapse
+    const toggleRightDeck = () => {
+        if (rightDeckSpread) {
+            // Collapse back to stack
+            const tl = gsap.timeline();
+            rightCardsRef.current.forEach((card, idx) => {
+                if (card) {
+                    tl.to(card, {
+                        x: idx * 4,
+                        y: -(idx * 4),
+                        rotation: 0,
+                        scale: 1,
+                        zIndex: bottomRightImages.length - idx,
+                        duration: 0.5,
+                        ease: "back.inOut(1.2)",
+                    }, idx * 0.03); // Stagger
+                }
+            });
+            // Disable dragging
+            rightCardsRef.current.forEach((card) => {
+                if (card && (card as any)._gsapDraggable) {
+                    (card as any)._gsapDraggable.kill();
+                }
+            });
+            setRightDeckSpread(false);
+        } else {
+            // Spread cards with staggered animation
+            const positions = getScatteredPositions(bottomRightImages.length, false);
+            const tl = gsap.timeline();
+
+            rightCardsRef.current.forEach((card, idx) => {
+                if (card && positions[idx]) {
+                    const pos = positions[idx];
+                    tl.to(card, {
+                        x: pos.x,
+                        y: pos.y,
+                        rotation: pos.rotation,
+                        scale: 0.95,
+                        zIndex: 5000 + idx,
+                        duration: 0.6,
+                        ease: "elastic.out(1, 0.6)",
+                    }, idx * 0.08); // Stagger each card
+
+                    // Make draggable with throw effect
+                    gsap.set(card, { cursor: "grab" });
+                    Draggable.create(card, {
+                        type: "x,y",
+                        edgeResistance: 0.65,
+                        onDragStart() {
+                            gsap.to(card, { scale: 1.05, duration: 0.2, overwrite: "auto" });
+                            gsap.set(card, { cursor: "grabbing", zIndex: 9999 });
+                        },
+                        onDragEnd() {
+                            gsap.to(card, { scale: 0.95, duration: 0.2, overwrite: "auto" });
+                            gsap.set(card, { cursor: "grab", zIndex: 5000 + idx });
+                        },
+                        throwProps: true,
+                        throwResistance: 4000,
+                    });
+                }
+            });
+            setRightDeckSpread(true);
+        }
+    };
+
+    // Fetch bottom left images
+    useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const response = await fetch("/api/section1-bottom-left");
+                const data = await response.json();
+                setBottomLeftImages(data.images || []);
+            } catch (error) {
+                console.error("Failed to fetch bottom left images:", error);
+                setBottomLeftImages([]);
+            } finally {
+                setLoadingLeftImages(false);
+            }
+        };
+        fetchImages();
+    }, []);
+
+    // Fetch bottom right images
+    useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const response = await fetch("/api/section1-bottom-right");
+                const data = await response.json();
+                setBottomRightImages(data.images || []);
+            } catch (error) {
+                console.error("Failed to fetch bottom right images:", error);
+                setBottomRightImages([]);
+            } finally {
+                setLoadingRightImages(false);
+            }
+        };
+        fetchImages();
+    }, []);
 
     useGSAP(() => {
         const tl = gsap.timeline({ delay: 0.3 });
 
-        // === META TEXT ANIMATION ===
-        // Slide in from left with rotation
-        tl.fromTo(".meta-text", {
-            x: -80,
-            opacity: 0,
-            rotateZ: -15,
-        }, {
-            x: 0,
-            opacity: 1,
-            rotateZ: 0,
-            duration: 1.0,
-            ease: "elastic.out(1, 0.8)",
-        }, 0);
-
-        // === MAIN TITLE ANIMATIONS - UNIFIED ELEMENT ANIMATIONS ===
-        // Line 1: "3RD ANNIVERSARY" - Vertical slide with unified animation
+        // === MAIN TITLE ANIMATIONS ===
+        // Line 1: "3RD ANNIVERSARY" - Vertical slide
         tl.fromTo(".title-line-1", {
             y: 100,
             opacity: 0,
@@ -61,9 +375,9 @@ export default function Section1_Intro() {
             rotateX: 0,
             duration: 1.2,
             ease: "back.out(1.3)",
-        }, 0.2);
+        }, 0);
 
-        // Line 2: "&" - Rotate and scale from center
+        // Line 2: "&" - Rotate and scale
         tl.fromTo(".title-line-2", {
             scale: 0,
             opacity: 0,
@@ -74,9 +388,9 @@ export default function Section1_Intro() {
             rotateZ: 0,
             duration: 0.8,
             ease: "elastic.out(1, 0.7)",
-        }, 0.4);
+        }, 0.3);
 
-        // Line 3: "EXCELLENCE AWARDS 2026" - Horizontal slide with unified animation
+        // Line 3: "EXCELLENCE AWARDS 2026" - Horizontal slide
         tl.fromTo(".title-line-3", {
             x: 80,
             opacity: 0,
@@ -87,130 +401,110 @@ export default function Section1_Intro() {
             rotateY: 0,
             duration: 1.2,
             ease: "power2.out",
-        }, 0.5);
+        }, 0.6);
 
-        // === SUBTITLE ANIMATION ===
-        // Fade with blur reduction and slight scale
-        tl.fromTo(".subtitle-element", {
-            y: 60,
-            opacity: 0,
-            filter: "blur(15px)",
-            scale: 0.95,
-        }, {
-            y: 0,
-            opacity: 1,
-            filter: "blur(0px)",
-            scale: 1,
-            duration: 1.2,
-            ease: "power3.out",
-        }, 1.2);
-
-        // === CTA BUTTON ANIMATION ===
-        // Bounce with shadow grow
-        tl.fromTo(".cta-button", {
-            y: 80,
-            opacity: 0,
-            scale: 0.6,
-        }, {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 1.0,
-            ease: "back.out(1.5)",
-        }, 1.8);
-
-        // === ACCENT ELEMENTS ===
-        tl.fromTo(".accent-element", {
-            opacity: 0,
-            x: (i) => i === 0 ? -100 : 100,
-        }, {
-            opacity: 1,
-            x: 0,
-            duration: 1.2,
-            stagger: 0.1,
-            ease: "power2.out",
-        }, 0.8);
-
-        // === CONTINUOUS FLOATING ANIMATIONS ===
-        // Accent elements subtle float
-        gsap.to(".accent-element", {
-            y: 12,
-            duration: 4,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            delay: (i) => i * 0.2,
+        // === CARD DECK ENTRANCE ANIMATIONS ===
+        // Left deck cards entrance - slide up with fade
+        leftCardsRef.current.forEach((card, idx) => {
+            if (card) {
+                tl.fromTo(card, {
+                    y: 80,
+                    opacity: 0,
+                    scale: 0.8,
+                    rotateY: -60,
+                }, {
+                    y: idx * 4,
+                    opacity: 1,
+                    scale: 1,
+                    rotateY: -15,
+                    duration: 0.7,
+                    ease: "back.out(1.1)",
+                }, 0.4 + idx * 0.08);
+            }
         });
 
-        // === META TEXT SHINY EFFECT ANIMATION ===
-        // Shine effect from left to right every 3 seconds
-        gsap.to(".meta-text", {
-            backgroundPosition: "200% center",
-            duration: 1.5,
-            repeat: -1,
-            repeatDelay: 1.5,
-            ease: "power1.inOut",
+        // Right deck cards entrance - slide down with fade
+        rightCardsRef.current.forEach((card, idx) => {
+            if (card) {
+                tl.fromTo(card, {
+                    y: -80,
+                    opacity: 0,
+                    scale: 0.8,
+                    rotateY: 60,
+                }, {
+                    y: -(idx * 4),
+                    opacity: 1,
+                    scale: 1,
+                    rotateY: -15,
+                    duration: 0.7,
+                    ease: "back.out(1.1)",
+                }, 0.4 + idx * 0.08);
+            }
         });
 
-        // === TITLE SMOOTH GROWING/NORMALIZING ANIMATION ===
-        // Smooth unified animation for whole title lines (not character-based)
-        gsap.to(".title-line-1", {
-            scale: 1.02,
-            duration: 3,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            delay: 2.5,
+    }, { scope: containerRef });
+
+    // === SCROLL TRANSITION: Section 1 → Section 2 (DIRECTIONAL EXIT) ===
+    useGSAP(() => {
+        if (!containerRef.current) return;
+
+        gsap.to({}, {
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: "60% center",
+                end: "bottom center",
+                scrub: 1,
+                markers: false,
+                onUpdate: (self) => {
+                    const progress = self.progress;
+
+                    // === LEFT COLUMN: Slides LEFT and fades out ===
+                    gsap.set([".title-line-1"], {
+                        x: gsap.utils.mapRange(0, 1, 0, -500, progress),
+                        opacity: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                    });
+
+                    // === RIGHT COLUMN: Slides RIGHT and fades out ===
+                    gsap.set([".title-line-3"], {
+                        x: gsap.utils.mapRange(0, 1, 0, 500, progress),
+                        opacity: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                    });
+
+                    // === & TEXT: Circles in and disappears ===
+                    gsap.set(".title-line-2", {
+                        scale: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                        opacity: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                        rotateZ: gsap.utils.mapRange(0, 1, 0, 360, progress), // Full circle rotation
+                    });
+
+                    // === COUNTDOWN: Stays visible and grows/elevates ===
+                    gsap.set(".mini-countdown-container", {
+                        scale: gsap.utils.mapRange(0, 1, 1, 1.8, progress),
+                        y: gsap.utils.mapRange(0, 1, 0, -80, progress),
+                        opacity: gsap.utils.mapRange(0, 1, 1, 1, progress),
+                    });
+
+                    // === CARD DECKS: Also exit left/right ===
+                    leftCardsRef.current.forEach((card) => {
+                        if (card) {
+                            gsap.set(card, {
+                                x: gsap.utils.mapRange(0, 1, 0, -400, progress),
+                                opacity: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                            });
+                        }
+                    });
+
+                    rightCardsRef.current.forEach((card) => {
+                        if (card) {
+                            gsap.set(card, {
+                                x: gsap.utils.mapRange(0, 1, 0, 400, progress),
+                                opacity: gsap.utils.mapRange(0, 1, 1, 0, progress),
+                            });
+                        }
+                    });
+                },
+            }
         });
-
-        gsap.to(".title-line-3", {
-            scale: 1.02,
-            duration: 3,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            delay: 2.5,
-        });
-
-        // === HOVER WOBBLE EFFECT ===
-        // Add wobble animation on mouse hover for title lines
-        const titleLine1 = containerRef.current?.querySelector(".title-line-1") || null;
-        const titleLine3 = containerRef.current?.querySelector(".title-line-3") || null;
-
-        const addWobble = (element: Element | null) => {
-            if (!element) return;
-
-            element.addEventListener("mouseenter", () => {
-                // Wobble animation on each letter
-                gsap.to(element.querySelectorAll(".char"), {
-                    x: (i) => Math.sin(i * 0.5) * 6,
-                    y: (i) => Math.cos(i * 0.3) * 4,
-                    rotation: (i) => Math.sin(i) * 3,
-                    duration: 0.5,
-                    ease: "power2.out",
-                    overwrite: "auto"
-                });
-            });
-
-            element.addEventListener("mouseleave", () => {
-                // Return to normal
-                gsap.to(element.querySelectorAll(".char"), {
-                    x: 0,
-                    y: 0,
-                    rotation: 0,
-                    duration: 0.8,
-                    ease: "elastic.out(1, 0.5)",
-                    overwrite: "auto"
-                });
-            });
-        };
-
-        addWobble(titleLine1);
-        addWobble(titleLine3);
-
-        return () => {
-            // Cleanup is handled by GSAP useGSAP scope
-        };
 
     }, { scope: containerRef });
 
@@ -218,106 +512,257 @@ export default function Section1_Intro() {
         <section
             ref={containerRef}
             id="section-1"
-            className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 py-24"
-            style={{ perspective: "1200px" }}
+            className="relative w-full flex flex-col items-center justify-center py-12"
+            style={{ perspective: "1200px", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", overflow: leftDeckSpread || rightDeckSpread ? "visible" : "hidden" }}
         >
-            {/* Animated Background Decorative Elements */}
-            <GeometricAccent delay={0} />
-            <div className="absolute top-24 right-12 opacity-0 pointer-events-none" style={{ animation: "float 7s ease-in-out infinite" }}>
-                <svg width="100" height="100" viewBox="0 0 100 100" className="text-black/5">
-                    <rect x="20" y="20" width="60" height="60" stroke="currentColor" strokeWidth="2" fill="none" />
-                    <line x1="20" y1="50" x2="80" y2="50" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-                    <line x1="50" y1="20" x2="50" y2="80" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-                </svg>
+            {/* Mini Countdown - 1/3 width, centered at top */}
+            <div className="w-full max-w-xs mb-8 px-4">
+                <div className="w-full rounded-xl backdrop-blur-md bg-white/10 border border-white/20 p-4"
+                    style={{
+                        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                    }}
+                >
+                    <MiniCountdown />
+                </div>
             </div>
 
-            {/* Main Hero Content Container */}
-            <div className="relative z-30 flex flex-col items-center justify-center text-center w-full max-w-6xl space-y-8">
+            {/* Main Hero Content Container - Flex Layout */}
+            <div className="relative z-30 w-full max-w-7xl flex items-center justify-center px-4">
+                <div className="flex gap-8 w-full" style={{ maxWidth: "1200px" }}>
+                    {/* Left Column - 3RD, ANNIVERSARY (Right Aligned) */}
+                    <div style={{ flex: "5", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end" }}>
+                        {/* "BTA" */}
+                        <div className="flex justify-end pr-4 pl-4">
+                            <p
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "700",
+                                    fontStyle: "italic",
+                                    fontSize: "45px",
+                                    lineHeight: "0.9",
+                                    color: "black",
+                                    margin: "0",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                BTA
+                            </p>
+                        </div>
 
-                {/* Meta Text - Top Label */}
-                <div className="flex items-center justify-center gap-3 w-full">
-                    <span
-                        className="meta-text uppercase tracking-[0.4em] text-sm md:text-base font-bold whitespace-nowrap text-black"
-                        style={{
-                            background: "linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 20%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,1) 80%, rgba(0,0,0,1) 100%)",
-                            backgroundSize: "200% center",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                            fontFamily: "var(--font-outfit), sans-serif",
-                        }}
-                    >
-                        BTA GlobalX Anniversary
-                    </span>
-                </div>
+                        {/* "3RD" */}
+                        <div className="title-line-1 flex justify-end pr-4">
+                            <h1
+                                className="font-black tracking-normal"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "900",
+                                    fontSize: "141px",
+                                    lineHeight: "0.9",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                3RD
+                            </h1>
+                        </div>
 
-                {/* Main Title - Custom Animation per Line */}
-                <div ref={decorativeRef} className="w-full space-y-3 md:space-y-6">
-                    {/* Line 1: "3RD ANNIVERSARY" */}
-                    <div className="title-line-1 overflow-hidden">
-                        <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-normal leading-none" style={{
-                            fontFamily: 'var(--font-outfit), sans-serif',
-                            textShadow: "2px 2px 4px rgba(0,0,0,0.08), 4px 4px 8px rgba(0,0,0,0.06)",
-                            letterSpacing: "0.01em",
-                            fontWeight: "900"
-                        }}>
-                            {Array.from("3RD ANNIVERSARY").map((char, i) => (
-                                <span key={i} className="char inline-block">{char === " " ? "\u00A0" : char}</span>
-                            ))}
-                        </h1>
-                    </div>
+                        {/* "ANNIVERSARY" */}
+                        <div className="title-line-1 flex justify-end pr-4">
+                            <h1
+                                className="font-black tracking-normal"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "900",
+                                    fontSize: "56px",
+                                    lineHeight: "0.9",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                ANNIVERSARY
+                            </h1>
+                        </div>
 
-                    {/* Line 2: "&" */}
-                    <div className="title-line-2 overflow-hidden py-1">
-                        <div className="text-3xl md:text-4xl font-light text-black" style={{
-                            fontFamily: 'var(--font-outfit), sans-serif',
-                        }}>
-                            <span className="char inline-block">&</span>
+                        {/* Bottom Left Image Deck */}
+                        <div className={`flex justify-end ${imageConfig.leftImagePaddingRight} ${imageConfig.topPadding} relative`} style={{ perspective: "1200px" }}>
+                            {loadingLeftImages ? (
+                                <div className="flex items-center justify-center text-black/30 text-xs" style={{ width: imageConfig.width, height: imageConfig.height }}>Loading...</div>
+                            ) : bottomLeftImages.length > 0 ? (
+                                <div className="relative" style={{ width: imageConfig.width, height: imageConfig.height }}>
+                                    {bottomLeftImages.map((img, idx) => (
+                                        <div
+                                            key={idx}
+                                            ref={(el) => {
+                                                if (el) leftCardsRef.current[idx] = el;
+                                            }}
+                                            className="absolute rounded-lg cursor-pointer transition-all"
+                                            onClick={toggleLeftDeck}
+                                            onMouseEnter={(e) => {
+                                                if (!leftDeckSpread) {
+                                                    gsap.to(e.currentTarget, { y: idx * 4 - 8, duration: 0.3, ease: "power2.out" });
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!leftDeckSpread) {
+                                                    gsap.to(e.currentTarget, { y: idx * 4, duration: 0.3, ease: "power2.out" });
+                                                }
+                                            }}
+                                            style={{
+                                                width: imageConfig.width,
+                                                height: imageConfig.height,
+                                                backfaceVisibility: "hidden",
+                                                willChange: "transform",
+                                                x: leftDeckSpread ? 0 : idx * 4,
+                                                y: leftDeckSpread ? 0 : idx * 4,
+                                                zIndex: leftDeckSpread ? 5000 + idx : bottomLeftImages.length - idx,
+                                                transform: leftDeckSpread ? undefined : `rotateY(-15deg)`,
+                                                transformStyle: "preserve-3d",
+                                            }}
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`Bottom left card ${idx + 1}`}
+                                                className="w-full h-full object-cover rounded-lg"
+                                                style={{
+                                                    boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center text-black/30 text-xs" style={{ width: imageConfig.width, height: imageConfig.height }}>No images</div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Line 3: "EXCELLENCE AWARDS 2026" */}
-                    <div className="title-line-3 overflow-hidden">
-                        <h2 className="text-3xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide leading-none" style={{
-                            fontFamily: 'var(--font-outfit), sans-serif',
-                            textShadow: "2px 2px 4px rgba(0,0,0,0.08)",
-                            letterSpacing: "0.03em",
-                            fontWeight: "800"
-                        }}>
-                            {Array.from("EXCELLENCE AWARDS 2026").map((char, i) => (
-                                <span key={i} className="char inline-block">{char === " " ? "\u00A0" : char}</span>
-                            ))}
-                        </h2>
+                    {/* Center Column - & (Centered) */}
+                    <div style={{ flex: "3", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                        {/* "&" */}
+                        <div className="title-line-2 flex justify-center">
+                            <div
+                                className="font-light text-black italic"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "700",
+                                    fontStyle: "italic",
+                                    fontSize: "337px",
+                                    lineHeight: "0.9",
+                                    textShadow: "4px 4px 0px rgba(0,0,0,0.3), 8px 8px 0px rgba(0,0,0,0.2), 12px 12px 20px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                &
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right Column - EXCELLENCE, AWARDS, 2026 (Left Aligned, Bottom) */}
+                    <div style={{ flex: "4", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start" }}>
+                        {/* Top Right Image Deck */}
+                        <div className={`flex justify-start ${imageConfig.rightImagePaddingLeft} ${imageConfig.bottomPadding} relative`} style={{ perspective: "1200px" }}>
+                            {loadingRightImages ? (
+                                <div className="flex items-center justify-center text-black/30 text-xs" style={{ width: imageConfig.width, height: imageConfig.height }}>Loading...</div>
+                            ) : bottomRightImages.length > 0 ? (
+                                <div className="relative" style={{ width: imageConfig.width, height: imageConfig.height }}>
+                                    {bottomRightImages.map((img, idx) => (
+                                        <div
+                                            key={idx}
+                                            ref={(el) => {
+                                                if (el) rightCardsRef.current[idx] = el;
+                                            }}
+                                            className="absolute rounded-lg cursor-pointer transition-all"
+                                            onClick={toggleRightDeck}
+                                            onMouseEnter={(e) => {
+                                                if (!rightDeckSpread) {
+                                                    gsap.to(e.currentTarget, { y: -(idx * 4) + 8, duration: 0.3, ease: "power2.out" });
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!rightDeckSpread) {
+                                                    gsap.to(e.currentTarget, { y: -(idx * 4), duration: 0.3, ease: "power2.out" });
+                                                }
+                                            }}
+                                            style={{
+                                                width: imageConfig.width,
+                                                height: imageConfig.height,
+                                                backfaceVisibility: "hidden",
+                                                willChange: "transform",
+                                                x: rightDeckSpread ? 0 : idx * 4,
+                                                y: rightDeckSpread ? 0 : -(idx * 4),
+                                                zIndex: rightDeckSpread ? 5000 + idx : bottomRightImages.length - idx,
+                                                transform: rightDeckSpread ? undefined : `rotateY(-15deg)`,
+                                                transformStyle: "preserve-3d",
+                                            }}
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`Right column card ${idx + 1}`}
+                                                className="w-full h-full object-cover rounded-lg"
+                                                style={{
+                                                    boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center text-black/30 text-xs" style={{ width: imageConfig.width, height: imageConfig.height }}>No images</div>
+                            )}
+                        </div>
+
+                        {/* "EXCELLENCE" */}
+                        <div className="title-line-3 flex justify-start pl-4">
+                            <h2
+                                className="font-bold tracking-wide"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "800",
+                                    fontSize: "50px",
+                                    lineHeight: "0.9",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                EXCELLENCE
+                            </h2>
+                        </div>
+
+                        {/* "AWARDS" */}
+                        <div className="title-line-3 flex justify-start pl-4">
+                            <h2
+                                className="font-bold tracking-wide"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "800",
+                                    fontSize: "90px",
+                                    lineHeight: "0.9",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                AWARDS
+                            </h2>
+                        </div>
+
+                        {/* "2026" */}
+                        <div className="title-line-3 flex justify-start pl-4">
+                            <h2
+                                className="font-light text-black italic"
+                                style={{
+                                    fontFamily: 'var(--font-outfit), sans-serif',
+                                    fontWeight: "700",
+                                    fontStyle: "italic",
+                                    fontSize: "40px",
+                                    lineHeight: "0.9",
+                                    textShadow: "3px 3px 0px rgba(0,0,0,0.3), 6px 6px 0px rgba(0,0,0,0.2), 9px 9px 15px rgba(0,0,0,0.4)"
+                                }}
+                            >
+                                2026
+                            </h2>
+                        </div>
                     </div>
                 </div>
-
-                {/* Subtitle */}
-                <div className="w-full max-w-3xl px-4 md:px-0 pt-6">
-                    <p className="subtitle-element text-lg md:text-xl lg:text-2xl font-playfair italic text-black tracking-wide font-light leading-relaxed">
-                        Celebrating three years of transformative impact while honoring the most outstanding achievements across industries.
-                    </p>
-                </div>
-
-                {/* CTA Button */}
-                <div className="pt-10 md:pt-12">
-                    <AnimatedButton text="Step Into the Spotlight" />
-                </div>
-
             </div>
 
-            {/* Side Accent Elements */}
-            <AccentElement text="EST. 2026 – GLOBAL X" position="left" />
-            <AccentElement text="HONORING EXCELLENCE" position="right" />
-
-            {/* Floating CSS Animation */}
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    50% { transform: translateY(-20px) rotate(2deg); }
-                }
-            `}</style>
+            {/* Styles */}
+            <style jsx>{``}</style>
         </section>
     );
-
 }
 

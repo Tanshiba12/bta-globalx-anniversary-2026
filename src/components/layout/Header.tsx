@@ -46,7 +46,7 @@ export default function Header() {
               <Link href="/" className="flex items-center gap-2">
                 <div className="relative h-20 w-64 logo-glitch">
                   <Image
-                    src="/assets/logo.png"
+                    src="/assets/BTA-Logo.gif"
                     alt="BTA Globalx 2026"
                     fill
                     className="object-contain object-left"
